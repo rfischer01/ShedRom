@@ -1,4 +1,4 @@
-<b><#selectbg_g>WilNeoLitic ROM BPL2 1.6.4.0</#></b>
+<b><#selectbg_g>WilNeoLitic ROM BQA2 1.6.5.0</#></b>
 
 <*>Updated Firm base to BPL2</*>
 <*>Updated Stock kernel & modem to BPL2</*>
