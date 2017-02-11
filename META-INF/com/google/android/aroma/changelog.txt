@@ -1,0 +1,7 @@
+<b><#selectbg_g>WilNeoLitic ROM BPL2 1.6.4.0</#></b>
+
+<*>Updated Firm base to BPL2</*>
+<*>Updated Stock kernel & modem to BPL2</*>
+<*>Reduced size by pre-deleting bloatware</*>
+<*>Updated Sony Bravia & X-Reality Engine 4</*>
+<*>Updated Busybox to 1.26</*>

@@ -1,0 +1,16 @@
+
+[*] Samsung for the Galaxy S5 Neo and base rom.
+
+[*] Chainfire for SuperSU and rooting method.
+
+[*] TWRP team for the recovery.
+
+[*] zhuhang for Viper and Guitardehero for ARISE.
+
+[*] gharrington for the 3Minit Battery mod.
+
+[*] debuffer for tuning the CPU.
+
+[*] amarullz for AROMA.
+
+[*] arter97, rovo89, wanam for Xposed.
