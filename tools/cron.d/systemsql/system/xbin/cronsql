@@ -1,0 +1,61 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+
+$BB mount -o remount,rw /
+$BB mount -o remount,rw / /
+$BB mount -o remount,rw rootfs
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+# Databases Optimizing #
+SQL=/data/cronlog/cronsql.log
+echo "" | tee -a $SQL
+echo "Starting SQL DB optimizing $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $SQL
+for i in \
+`busybox find /data -iname "*.db"`; 
+do \
+	/system/xbin/sqlite3 $i 'VACUUM;'; 
+	/system/xbin/sqlite3 $i 'REINDEX;'; 
+done;
+if [ -d "/dbdata" ]; then
+	for i in \
+	`busybox find /dbdata -iname "*.db"`; 
+	do \
+		/system/xbin/sqlite3 $i 'VACUUM;'; 
+		/system/xbin/sqlite3 $i 'REINDEX;'; 
+	done;
+fi;
+if [ -d "/datadata" ]; then
+	for i in \
+	`busybox find /datadata -iname "*.db"`; 
+	do \
+		/system/xbin/sqlite3 $i 'VACUUM;'; 
+		/system/xbin/sqlite3 $i 'REINDEX;'; 
+	done;
+fi;
+for i in \
+`busybox find /sdcard -iname "*.db"`; 
+do \
+	/system/xbin/sqlite3 $i 'VACUUM;'; 
+	/system/xbin/sqlite3 $i 'REINDEX;'; 
+done;
+echo "Optimizing /data" | tee -a $SQL
+echo "Optimizing /dbdata" | tee -a $SQL
+echo "Optimizing /datadata" | tee -a $SQL
+echo "Optimizing /sdcard" | tee -a $SQL
+echo "SQL DB optimizing finished at $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $SQL
+
+# Set Permissions
+chown 0:0 -R /data/cronlog/cronsql.log
+chmod 755 -R /data/cronlog/cronsql.log
+chcon u:object_r:system_file:s0 /data/cronlog/cronsql.log
+
+# Remount read-only
+$BB mount -o remount,ro /
+$BB mount -o remount,ro / /
+$BB mount -o remount,ro rootfs
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system

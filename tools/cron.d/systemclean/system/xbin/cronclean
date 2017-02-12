@@ -1,0 +1,98 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+$BB mount -o remount,rw /cache
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+LOG_FILE=/data/cronlog/cronclean.log
+echo "Starting Automatic Cleaning $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
+busybox find /data/data -type d -iname "*cache*" -exec busybox rm -f {}/* ';' -exec echo "Cleared {}" ';'
+rm -f /cache/*.*
+rm -f /cache/recovery/*.*
+echo "Automatic Cleaning /cache" | tee -a $LOG_FILE;
+for file in /cache/*.*
+do
+  if [ -e "\$file" ]
+  then
+	busybox echo "/cache not cleaned" | tee -a $LOG_FILE;
+else
+	busybox echo "/cache cleaned" | tee -a $LOG_FILE;
+fi
+done
+rm -f /data/*.log
+rm -f /data/*.txt
+rm -f /data/anr/*.log
+rm -f /data/anr/*.txt
+rm -f /data/backup/pending/*.tmp
+rm -f /data/cache/*.*
+rm -f /data/last_alog/*.log
+rm -f /data/last_alog/*.txt
+rm -f /data/last_kmsg/*.log
+rm -f /data/last_kmsg/*.txt
+rm -f /data/mlog/*
+rm -f /data/local/*.apk
+rm -f /data/local/tmp/*.apk
+rm -f /data/local/*.log
+rm -f /data/local/*.txt
+rm -f /data/local/tmp/*.log
+rm -f /data/local/tmp/*.txt
+rm -f /data/log/*.log
+rm -f /data/log/*.txt
+rm -f /data/system/*.log
+rm -f /data/system/*.txt
+rm -f /data/system/dropbox/*.log
+rm -f /data/system/dropbox/*.txt
+rm -f /data/system/usagestats/*.log
+rm -f /data/system/usagestats/*.txt
+rm -f /data/tombstones/*.*
+echo "Automatic Cleaning /data" | tee -a $LOG_FILE;
+for file in /data/*.log
+do
+  if [ -e "\$file" ]
+  then
+	busybox echo "/data not cleaned" | tee -a $LOG_FILE;
+else
+	busybox echo "/data cleaned" | tee -a $LOG_FILE;
+fi
+done
+rm -f /data/dalvik-cache/*.apk
+rm -f /data/dalvik-cache/*.tmp
+rm -f /data/dalvik-cache/*.log
+rm -f /data/dalvik-cache/*.txt
+rm -f /data/dalvik-cache/*
+rm -f /data/dalvik-cache/*.*
+echo "Automatic Cleaning /data/dalvik-cache" | tee -a $LOG_FILE;
+for file in /data/dalvik-cache/*.*
+do
+  if [ -e "\$file" ]
+  then
+	busybox echo "/dalvik-cache not cleaned" | tee -a $LOG_FILE;
+else
+	busybox echo "/dalvik-cache cleaned" | tee -a $LOG_FILE;
+fi
+done
+rm -f /data/data/*.log
+rm -f /data/data/*.txt
+echo "Automatic Cleaning /data/data" | tee -a $LOG_FILE;
+for file in /data/data/*.log
+do
+  if [ -e "\$file" ]
+  then
+	busybox echo "/data/data not cleaned" | tee -a $LOG_FILE;
+else
+	busybox echo "/data/data cleaned" | tee -a $LOG_FILE;
+fi
+done
+echo "Automatic Cleaning finished at $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
+echo "" | tee -a $LOG_FILE;
+
+# Set Permissions
+chown 0:0 -R /data/cronlog/cronclean.log
+chmod 755 -R /data/cronlog/cronclean.log
+chcon u:object_r:system_file:s0 /data/cronlog/cronclean.log
+
+# Remount read-only
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system

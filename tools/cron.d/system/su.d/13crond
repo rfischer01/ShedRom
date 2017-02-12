@@ -1,0 +1,144 @@
+#!/system/bin/sh
+BB=/system/bin/busybox
+CROND=/data/tweakslog/cron_service_test.log
+LOG=/data/cronlog/croninstall.log
+$BB mount -o remount,rw /
+$BB mount -o remount,rw /system
+
+# Creating /data/tweakslog
+if [ -e $LOG ]; then
+rm $LOG;
+fi;
+chown 0:0 -R /data/tweakslog/cron_service_test.log
+chmod 755 -R /data/tweakslog/cron_service_test.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/cron_service_test.log
+
+# Deleting /data/cronlog
+rm /data/cronlog/cronclean*.*
+rm /data/cronlog/crontrim*.*
+rm /data/cronlog/cronsql*.*
+rm /CON
+rm /data/CON
+
+# Test cron_service_test.log
+if [ -e $CROND ]; then
+rm $CROND;
+fi;
+
+# Test /system/etc/passwd
+if test -f /system/etc/passwd
+then
+	echo "/system/etc/passwd already exists"
+	$BB echo "/system/etc/passwd already exists" | $BB tee -a $LOG;
+else
+	echo "root:x:0:0::/system/etc/cron.d:/bin/sh" > /system/etc/passwd
+	$BB chown 0:0 /system/etc/passwd
+	$BB chmod 755 -R /system/etc/passwd
+	$BB chcon u:object_r:system_file:s0 /system/etc/passwd
+	$BB echo "/system/etc/passwd created" | $BB tee -a $LOG;
+fi
+
+# Test /system/etc/group
+if test -f /system/etc/group
+then
+	echo "/system/etc/group already exists"
+	$BB echo "/system/etc/group already exists" | $BB tee -a $LOG;
+else
+	echo "root:x:0:root" > /system/etc/group
+	$BB chown 0:0 /system/etc/group
+	$BB chmod 755 -R /system/etc/group
+	$BB chcon u:object_r:system_file:s0 /system/etc/group
+	$BB echo "/system/etc/group created" | $BB tee -a $LOG;
+fi
+
+# Test /system/etc/shadow
+if test -f /system/etc/shadow
+then
+	echo "/system/etc/shadow already exists"
+	$BB echo "/system/etc/shadow already exists" | $BB tee -a $LOG;
+else
+	echo "root:*:12410:0:99999:7:::" > /system/etc/shadow
+	$BB chown 0:0 /system/etc/shadow
+	$BB chmod 755 -R /system/etc/shadow
+	$BB chcon u:object_r:system_file:s0 /system/etc/shadow
+	$BB echo "/system/etc/shadow created" | $BB tee -a $LOG;
+fi
+
+# Test /bin/bash if not exists then symlink
+if test -f /bin/bash
+then
+	echo "/bin/bash found"
+	$BB echo "/bin/bash found" | $BB tee -a $LOG;
+else
+	echo "/bin/bash not found. Copying..."
+	$BB echo "/bin/bash not found. Copying" | $BB tee -a $LOG;
+	mkdir /bin
+	$BB chmod 755 -R /bin
+	$BB chown 0:0 /bin
+	$BB chmod 755 -R /bin
+	$BB chcon u:object_r:rootfs:s0 /bin
+	cp -p /system/etc/cron.d/bin/bash /bin
+	$BB chmod 755 -R /bin/bash
+	$BB chown 0:0 /bin/bash
+	$BB chmod 755 -R /bin/bash
+	$BB chcon u:object_r:rootfs:s0 /bin/bash
+fi
+
+# Test /bin/sh if not exists then symlink
+if test -f /bin/sh
+then
+	echo "/bin/sh found"
+	$BB echo "/bin/sh found" | $BB tee -a $LOG;
+else
+	echo "bin/sh not found. Symlinking..."
+	$BB echo "bin/sh not found. Symlinking..." | $BB tee -a $LOG;
+	$BB ln -s /system/bin/sh /bin/sh
+	$BB chmod 755 -R /bin/sh
+	$BB chown 0:0 /bin/sh
+	$BB chmod 755 -R /bin/sh
+	$BB chcon u:object_r:system_file:s0 /bin/sh
+fi
+
+# Test symlink /bin/sh if not exists then copying
+if test -f /bin/sh
+then
+	echo "/bin/sh symlink found"
+else
+	echo "bin/sh symlink not found. Copying..."
+	$BB echo "bin/sh symlink not found. Copying..." | $BB tee -a $LOG;
+	cp -p /system/etc/cron.d/bin/sh /bin
+	$BB chmod 755 -R /bin/sh
+	$BB chown 0:0 /bin/sh
+	$BB chmod 755 -R /bin/sh
+fi
+
+# Hardcoded crontab variable. Symlinking.
+mkdir -p /var
+$BB chmod 755 -R /var
+mkdir -p /var/spool
+$BB chmod 755 -R /var/spool
+mkdir -p /var/spool/cron
+$BB chmod 755 -R /var/spool/cron
+mkdir -p /var/spool/cron/crontabs
+$BB echo "Creating /var/spool/cron/crontabs" | $BB tee -a $LOG;
+$BB chmod 755 -R /var/spool/cron/crontabs
+$BB chown 0:0 /var/spool/cron/crontabs
+$BB chcon u:object_r:system_file:s0 /var/spool/cron/crontabs
+$BB ln -s /system/etc/cron.d/root /var/spool/cron/crontabs/root
+$BB echo "Symlinking /system/etc/cron.d/root to contabs" | $BB tee -a $LOG;
+$BB chmod 755 -R /var/spool/cron/crontabs/root
+$BB chown 0:0 /var/spool/cron/crontabs/root
+$BB chmod 755 -R /var/spool/cron/crontabs/root
+#Change GMT-2 according to your zone http://www.timeanddate.com/time/zones/
+TZ=GMT-2 && export TZ  && echo "TZ (timezone variable) set to $TZ"
+
+# Running cronjob
+$BB crond -b -c /system/etc/cron.d/root && echo "crond service start successfully at `date`" >> $CROND
+$BB chown 0:0 -R /data/tweakslog/cron_service_test.log
+$BB chmod 755 -R /data/tweakslog/cron_service_test.log
+$BB chcon u:object_r:system_data_file:s0 /data/tweakslog/cron_service_test.log
+$BB chown 0:0 -R /data/cronlog/croninstall.log
+$BB chmod 755 -R /data/cronlog/croninstall.log
+$BB chcon u:object_r:system_data_file:s0 /data/cronlog/croninstall.log
+$BB mount -o remount,ro /
+$BB mount -o remount,ro /system

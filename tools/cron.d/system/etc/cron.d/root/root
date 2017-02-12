@@ -1,0 +1,1 @@
+1 */12 * * * echo "Crontab is working on `date`" >> /data/cronlog/crontab.log && chmod 755 -R /data/cronlog/crontab.log

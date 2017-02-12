@@ -1,0 +1,35 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+$BB mount -o remount,rw /cache
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+# FSTRIM #
+
+FST=/data/cronlog/crontrim.log
+trim=/system/xbin/fstrim
+SLEEP_TIME=1
+
+$BB echo "FSTriming started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $FST;
+$BB $trim -v /system
+$BB echo "system trimmed" | $BB tee -a $FST;
+$BB sleep $SLEEP_TIME
+$BB $trim -v /data
+$BB echo "data trimmed" | $BB tee -a $FST;
+$BB sleep $SLEEP_TIME
+$BB $trim -v /cache
+$BB echo "cache trimmed" | $BB tee -a $FST;
+$BB echo "FSTriming completed at : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $FST;
+$BB echo "" | $BB tee -a $FST;
+
+# Set Permissions
+chown 0:0 -R /data/cronlog/crontrim.log
+chmod 755 -R /data/cronlog/crontrim.log
+chcon u:object_r:system_file:s0 /data/cronlog/crontrim.log
+
+# Remount read-only
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system
