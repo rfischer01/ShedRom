@@ -1,7 +1,6 @@
-<b><#selectbg_g>WilNeoLitic ROM BQA2 1.6.5.0</#></b>
+<b><#selectbg_g>Shedrock ROM BQA2 1.6.5.0</#></b>
 
-<*>Updated Firm base to BPL2</*>
-<*>Updated Stock kernel & modem to BPL2</*>
-<*>Reduced size by pre-deleting bloatware</*>
-<*>Updated Sony Bravia & X-Reality Engine 4</*>
-<*>Updated Busybox to 1.26</*>
+<*>Updated Firm base to BQA2</*>
+<*>Updated Stock kernel & modem to BQA2</*>
+<*>Reduced size by pre-deleting more bloatware</*>
+<*>Changed rom name</*>
