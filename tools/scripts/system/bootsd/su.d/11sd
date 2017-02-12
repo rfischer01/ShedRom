@@ -1,0 +1,318 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+
+$BB mount -o remount,rw /
+$BB mount -o remount,rw / /
+$BB mount -o remount,rw rootfs
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+# SD R/W Tweaks #
+SD=/data/tweakslog/11SDT.log
+# Kernel Tweaks #
+KR=/data/tweakslog/13KER.log
+# System Tweaks #
+SYS=/data/tweakslog/09SYS.log
+if [ -e $SD ]; then
+	rm $SD;
+fi;
+if [ -e $SYS ]; then
+	rm $SYS;
+fi;
+if [ -e $KR ]; then
+	rm $KR;
+fi;
+$BB echo "" | $BB tee -a $SD;
+$BB echo "SD Tweaks started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SD;
+if [ -e /sys/devices/virtual/bdi/179:0/read_ahead_kb ]; then
+$BB echo "1024" > /sys/devices/virtual/bdi/179:0/read_ahead_kb;
+fi;
+if [ -e /sys/devices/virtual/bdi/179:8/read_ahead_kb ]; then
+$BB echo "1024" > /sys/devices/virtual/bdi/179:8/read_ahead_kb;
+fi;
+if [ -e /sys/devices/virtual/bdi/179:28/read_ahead_kb ]; then
+$BB echo "1024" > /sys/devices/virtual/bdi/179:28/read_ahead_kb;
+fi;
+if [ -e /sys/devices/virtual/bdi/179:32/read_ahead_kb ]; then
+$BB echo "1024" > /sys/devices/virtual/bdi/179:32/read_ahead_kb;
+fi;
+if [ -e /sys/devices/virtual/bdi/default/read_ahead_kb ]; then
+$BB echo "256" > /sys/devices/virtual/bdi/default/read_ahead_kb;
+fi;
+L=1024
+MMC="/sys/block/mmc*"
+for S in $MMC
+do
+if [ -e "$S/queue/read_ahead_kb" ]; then
+$BB echo "$L" > "$S/queue/read_ahead_kb";
+fi
+if [ -e "$S/bdi/read_ahead_kb" ]; then
+$BB echo "$L" > "$S/bdi/read_ahead_kb";
+fi
+if [ -e "$S/queue/add_random" ]; then
+$BB echo "0" > "$S/queue/add_random";
+fi
+done;
+BDI=`ls -d /sys/devices/virtual/bdi/*`
+SDReadTweak=$((((mem/1024)/64+1)*128))
+for i in $BDI
+do
+if [ -e $i/read_ahead_kb ]; then
+$BB	echo "$SDReadTweak" > $i/read_ahead_kb;
+fi
+done;
+$BB echo "SD Tweaks completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SD;
+$BB echo "=>Modding Low Memory Killer" | $BB tee -a $SYS;
+if [ -e /sys/module/lowmemorykiller/parameters/cost ]; then
+$BB	echo "48" > /sys/module/lowmemorykiller/parameters/cost;
+fi
+if [ -e /sys/module/lowmemorykiller/parameters/debug_level ]; then
+$BB	echo "0" > /sys/module/lowmemorykiller/parameters/debug_level;
+fi
+$BB echo "LMK mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "" | $BB tee -a $SYS;
+$BB echo "=>Modding I/O" | $BB tee -a $SYS;
+for S in /sys/block/*
+do
+if [ -f "$S/queue/rq_affinity" ]; then
+$BB echo "1" > $S/queue/rq_affinity;
+fi
+if [ -f "$S/queue/rotational" ]; then
+$BB echo "0" > $S/queue/rotational;
+fi
+if [ -f "$S/queue/iostats" ]; then
+$BB echo "0" > $S/queue/iostats;
+fi
+if [ -f "$S/queue/nomerges" ]; then
+$BB echo "1" > $S/queue/nomerges;
+fi
+if [ -e "$i/iosched/low_latency" ]; then
+$BB	echo "1" > $i/iosched/low_latency;
+fi
+if [ -e "$i/iosched/back_seek_penalty" ]; then
+$BB	echo "1" > $i/iosched/back_seek_penalty;
+fi
+if [ -e "$i/iosched/back_seek_max" ]; then
+$BB	echo "1000000000" > $i/iosched/back_seek_max;
+fi
+if [ -e "$i/iosched/slice_idle" ]; then
+$BB	echo "0" > $i/slice_idle;
+fi
+if [ -e "$i/iosched/quantum" ]; then
+$BB	echo "16" > $i/quantum;
+fi
+if [ -e "$i/iostats" ]; then
+$BB	echo "0" > $i/iostats;
+fi
+if [ -e "$i/nomerges" ]; then
+$BB	echo "0" > $i/nomerges;
+fi
+done;
+$BB echo "=>Searching value to change" | $BB tee -a $SYS;
+MMC="/sys/block/mmc*"
+for S in $MMC
+do
+if [ -e "$S/queue/nr_requests" ]; then
+$BB echo "512" > $S/queue/nr_requests;
+fi
+done;
+for i in /sys/block/*/queue
+do
+if [ -e "$i/rotational" ]; then 
+$BB	echo "0" > $i/rotational;
+fi
+if [ -e "$i/nr_requests" ]; then
+$BB	echo "10240" > $i/nr_requests;
+fi
+if [ -e "$i/iosched/fifo_batch" ]; then
+$BB	echo "1" > $i/iosched/fifo_batch;
+fi
+if [ -e "$i/iosched/writes_starved" ]; then
+$BB	echo "1" > $i/iosched/writes_starved;
+fi
+if [ -e "$i/read_ahead_kb" ]; then
+$BB	echo "1024" >  $i/read_ahead_kb;
+fi
+done;
+$BB echo "I/O mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "" | $BB tee -a $SYS;
+$BB echo "System Swap mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+if [ -e /proc/swaps ]; then
+$BB	echo "10" > /proc/sys/fs/lease-break-time;
+$BB	echo "32000" > /proc/sys/fs/inotify.max_queued_events;
+$BB	echo "256" > /proc/sys/fs/inotify.max_user_instances;
+$BB	echo "10240" > /proc/sys/fs/inotify.max_user_watches;
+$BB	echo "524288" > /proc/sys/fs/file-max;
+$BB	echo "0" > /proc/sys/vm/laptop_mode;
+$BB	echo "4" > /proc/sys/vm/min_free_order_shift;
+$BB	echo "40" > /proc/sys/vm/swappiness;
+$BB	echo "500" > /proc/sys/vm/dirty_expire_centisecs;
+$BB	echo "1000" > /proc/sys/vm/dirty_writeback_centisecs;
+$BB	echo "10" > /proc/sys/vm/dirty_background_ratio;
+$BB	echo "20" > /proc/sys/vm/dirty_ratio;
+$BB	echo "2" > /proc/sys/vm/page-cluster;
+fi
+$BB echo "System Swap mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "" | $BB tee -a $SYS;
+$BB echo "System Cache mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB	echo "70" > /proc/sys/vm/vfs_cache_pressure;
+$BB	echo "1" > /proc/sys/vm/overcommit_memory;
+$BB	echo "75" > /proc/sys/vm/overcommit_ratio;
+$BB echo "System Cache mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "" | $BB tee -a $SYS;
+$BB echo "CPU mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+if [ -e /dev/cpuctl/cpu.rt_runtime_us ]; then
+$BB echo "800000" > /dev/cpuctl/cpu.rt_runtime_us;
+fi
+if [ -e /dev/cpuctl/cpu.rt_period_us ]; then
+$BB echo "1000000" > /dev/cpuctl/cpu.rt_period_us;
+fi
+if [ -e /dev/cpuctl/bg_non_interactive/cpu.shares ]; then
+$BB echo "62" > /dev/cpuctl/bg_non_interactive/cpu.shares;
+fi
+if [ -e /dev/cpuctl/bg_non_interactive/cpu.rt_runtime_us ]; then
+$BB echo "700000" > /dev/cpuctl/bg_non_interactive/cpu.rt_runtime_us;
+fi
+if [ -e /dev/cpuctl/bg_non_interactive/cpu.rt_period_us ]; then
+$BB echo "1000000" > /dev/cpuctl/bg_non_interactive/cpu.rt_period_us;
+fi
+MCPS="/sys/devices/system/cpu/sched_mc_power_savings"
+if [ -e "$MCPS" ]; then
+echo "2" > "$MCPS";
+fi
+$BB echo "CPU mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "" | $BB tee -a $SYS;
+$BB echo "OOM mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB	echo "1" > /proc/sys/vm/oom_dump_tasks;
+$BB	echo "1" > /proc/sys/vm/oom_kill_allocating_task;
+$BB echo "OOM mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $SYS;
+$BB echo "Kernel Tweaks started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Seeder mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+if [ -e /proc/sys/kernel/random/read_wakeup_threshold ]; then
+$BB	echo "1366" > /proc/sys/kernel/random/read_wakeup_threshold;
+fi
+if [ -e /proc/sys/kernel/random/write_wakeup_threshold ]; then
+$BB	echo "2048" > /proc/sys/kernel/random/write_wakeup_threshold;
+fi
+$BB echo "Seeder mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Kernel Sleeper mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+if [ -e /sys/kernel/debug/sched_features ]; then
+$BB	echo "NO_AFFINE_WAKEUPS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_CACHE_HOT_BUDDY" > /sys/kernel/debug/sched_features; 
+$BB	echo "NO_DOUBLE_TICK" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_FORCE_SD_OVERLAP" > /sys/kernel/debug/sched_features; 
+$BB	echo "NO_GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_HRTICK" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_LAST_BUDDY" > /sys/kernel/debu/sched_features;
+$BB	echo "NO_LB_BIAS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_LB_MIN" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_NEW_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_NEXT_BUDDY" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_NORMALIZED_SLEEPERS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_OWNER_SPIN" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_SYNC_WAKEUPS" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_RT_RUNTIME_SHARE" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_START_DEBIT" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_WAKEUP_OVERLAP" > /sys/kernel/debug/sched_feature;
+$BB	echo "NO_WAKEUP_SYNC" > /sys/kernel/debug/sched_feature;
+$BB	echo "WAKEUP_PREEMPT" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_NONTASK_POWER" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_ARCH_POWER" > /sys/kernel/debug/sched_features;
+$BB	echo "NO_TTWU_QUEUE" > /sys/kernel/debug/sched_features;
+fi
+$BB echo "Kernel Sleeper mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Kernel Panic started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+if [ -e /proc/sys/vm/panic_on_oom ]; then
+$BB	echo "0" > /proc/sys/vm/panic_on_oom;
+fi
+if [ -e /proc/sys/kernel/panic_on_oops ]; then
+$BB	echo "0" > /proc/sys/kernel/panic_on_oops;
+fi
+if [ -e /proc/sys/kernel/softlockup_panic ]; then
+$BB	echo "0" > /proc/sys/kernel/softlockup_panic;
+fi
+if [ -e /proc/sys/kernel/panic ]; then
+$BB	echo "0" > /proc/sys/kernel/panic;
+fi
+$BB echo "Kernel Panic mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Fast Charge mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+FAST_CHARGE="/sys/kernel/fast_charge/force_fast_charge"
+if [ -e "$FAST_CHARGE" ]; then
+$BB echo "1" > "$FAST_CHARGE";
+fi
+$BB echo "Fast Charge mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Kernel Various mod started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+if [ -e /proc/sys/kernel/hung_task_timeout_secs ]; then
+$BB	echo "25" > /proc/sys/kernel/hung_task_timeout_secs;
+fi
+if [ -e /proc/sys/kernel/msgmni ]; then
+$BB	echo "2048" > /proc/sys/kernel/msgmni;
+fi
+if [ -e /proc/sys/kernel/msgmax ]; then
+$BB	echo "65536" > /proc/sys/kernel/msgmax;
+fi
+if [ -e /proc/sys/kernel/shmmni ]; then
+$BB	echo "4096" > /proc/sys/kernel/shmmni;
+fi
+if [ -e /proc/sys/kernel/shmall ]; then
+$BB	echo "2097152" > /proc/sys/kernel/shmall;
+fi
+if [ -e /proc/sys/kernel/shmmax ]; then
+$BB	echo "268435456" > /proc/sys/kernel/shmmax;
+fi
+if [ -e /proc/sys/kernel/sem ]; then
+$BB	echo "500 512000 64 2048" > /proc/sys/kernel/sem;
+fi
+if [ -e /proc/sys/kernel/sched_features ]; then
+$BB	echo "24189" > /proc/sys/kernel/sched_features;
+fi
+if [ -e /proc/sys/kernel/sched_latency_ns ]; then
+$BB	echo "18000000" > /proc/sys/kernel/sched_latency_ns;
+fi
+if [ -e /proc/sys/kernel/sched_min_granularity_ns ]; then
+$BB	echo "1500000" > /proc/sys/kernel/sched_min_granularity_ns;
+fi
+if [ -e /proc/sys/kernel/sched_wakeup_granularity_ns ]; then
+$BB	echo "3000000" > /proc/sys/kernel/sched_wakeup_granularity_ns;
+fi
+if [ -e /proc/sys/kernel/threads-max ]; then
+$BB	echo "524288" > /proc/sys/kernel/threads-max;
+fi
+if [ -e /proc/sys/kernel/sched_shares_ratelimit ]; then
+$BB	echo "256000" > /proc/sys/kernel/sched_shares_ratelimit;
+fi
+if [ -e /proc/sys/kernel/sched_child_runs_first ]; then
+$BB	echo "0" > /proc/sys/kernel/sched_child_runs_first;
+fi
+if [ -e /proc/sys/kernel/sched_compat_yield ]; then
+$BB	echo "1" > /proc/sys/kernel/sched_compat_yield;
+fi
+$BB echo "Kernel Various mod completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+$BB echo "" | $BB tee -a $KR;
+$BB echo "Kernel Tweaks activated at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KR;
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/11SDT.log
+chmod 755 -R /data/tweakslog/11SDT.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/11SDT.log
+chown 0:0 -R /data/tweakslog/13KER.log
+chmod 755 -R /data/tweakslog/13KER.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/13KER.log
+chown 0:0 -R /data/tweakslog/09SYS.log
+chmod 755 -R /data/tweakslog/09SYS.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/09SYS.log
+
+# Remount read-only
+$BB mount -o remount,ro /
+$BB mount -o remount,ro / /
+$BB mount -o remount,ro rootfs
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system

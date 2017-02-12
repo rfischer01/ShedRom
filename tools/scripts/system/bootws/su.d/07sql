@@ -1,0 +1,93 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+
+$BB mount -o remount,rw /
+$BB mount -o remount,rw / /
+$BB mount -o remount,rw rootfs
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+# Wifi Sleeping #
+WS=/data/tweakslog/07WS.log
+if [ -e $WS ]; then
+	rm $WS;
+fi;
+chown 0:0 -R /data/tweakslog/07WS.log
+chmod 755 -R /data/tweakslog/07WS.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/07WS.log
+$BB echo "Configuring Wifi Sleeping STARTED ON : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $WS;
+# wait value = 10 seconds
+sqlite=/system/xbin/sqlite3;
+wait=10000;
+RETURN_VALUE=$($sqlite /data/data/com.android.providers.settings/databases/settings.db "select value from secure where name='wifi_idle_ms'");
+if [ $RETURN_VALUE='' ] 
+then
+$sqlite /data/data/com.android.providers.settings/databases/settings.db "insert into secure (name, value) values ('wifi_idle_ms', $wait )"
+$BB echo "Creating row with wifi_idle_ms value: $wait..." | $BB tee -a $WS;
+else
+$sqlite /data/data/com.android.providers.settings/databases/settings.db "update secure set value=$wait where name='wifi_idle_ms'"
+$BB echo "Updating wifi_idle_ms value from $RETURN_VALUE to $wait..." | $BB tee -a $WS;
+fi;
+$BB echo "Wifi Sleeping Configured at : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $WS;
+
+# Databases Optimizing #
+SQL=/data/tweakslog/07SQL.log
+if [ -e $SQL ]; then
+	rm $SQL;
+fi;
+chown 0:0 -R /data/tweakslog/07SQL.log
+chmod 755 -R /data/tweakslog/07SQL.log
+chcon u:object_r:system_file:s0 /data/tweakslog/07SQL.log
+echo "" | tee -a $SQL
+echo "Starting SQL DB optimizing $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $SQL
+for i in \
+`busybox find /data -iname "*.db"`; 
+do \
+	/system/xbin/sqlite3 $i 'VACUUM;'; 
+	/system/xbin/sqlite3 $i 'REINDEX;'; 
+done;
+if [ -d "/dbdata" ]; then
+	for i in \
+	`busybox find /dbdata -iname "*.db"`; 
+	do \
+		/system/xbin/sqlite3 $i 'VACUUM;'; 
+		/system/xbin/sqlite3 $i 'REINDEX;'; 
+	done;
+fi;
+if [ -d "/datadata" ]; then
+	for i in \
+	`busybox find /datadata -iname "*.db"`; 
+	do \
+		/system/xbin/sqlite3 $i 'VACUUM;'; 
+		/system/xbin/sqlite3 $i 'REINDEX;'; 
+	done;
+fi;
+for i in \
+`busybox find /sdcard -iname "*.db"`; 
+do \
+	/system/xbin/sqlite3 $i 'VACUUM;'; 
+	/system/xbin/sqlite3 $i 'REINDEX;'; 
+done;
+echo "Optimizing /data" | tee -a $SQL
+echo "Optimizing /dbdata" | tee -a $SQL
+echo "Optimizing /datadata" | tee -a $SQL
+echo "Optimizing /sdcard" | tee -a $SQL
+echo "SQL DB optimizing finished at $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $SQL
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/07WS.log
+chmod 755 -R /data/tweakslog/07WS.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/07WS.log
+chown 0:0 -R /data/tweakslog/07SQL.log
+chmod 755 -R /data/tweakslog/07SQL.log
+chcon u:object_r:system_file:s0 /data/tweakslog/07SQL.log
+
+# Remount read-only
+$BB mount -o remount,ro /
+$BB mount -o remount,ro / /
+$BB mount -o remount,ro rootfs
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system

@@ -1,0 +1,93 @@
+#!/system/bin/sh
+
+# $ANDROID_DATA is android environment variable
+LOG="$ANDROID_DATA/tweakslog/04fs.log"
+
+if [ -e $LOG ]; then
+	rm $LOG;
+fi;
+chown 0:0 -R /data/tweakslog/04fs.log
+chmod 755 -R /data/tweakslog/04fs.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/04fs.log
+# Text at the start of the log
+LOG_START="--- FSTrim started on $(date "+%b %d, %Y %H:%M:%S") ---\n"
+
+# Text at the end of the log
+LOG_END="--- FSTrim completed - END OF LOG ---"
+
+# Array of mounted volumes to loop through
+MOUNTS=("/*")
+
+# Create the log and write the heading to it
+echo $LOG_START >> $LOG
+
+#
+# BEGIN FILESYSTEM MOUNTS
+#
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh, barrier=0 -t auto / >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh, barrier=0 -t auto /dev >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /proc >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /sys >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,nodelalloc,noauto_da_alloc,nodev,data=ordered,nobh,barrier=0 -t auto /system >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,nodelalloc,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /data >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,nodelalloc,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /cache >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /dev/pts >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /mnt/asec >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /mnt/obb >> $LOG
+
+busybox mount -o remount,noatime,nodiratime,noauto_da_alloc,nosuid,nodev,data=ordered,nobh,barrier=0 -t auto /storage/sdcard0 >> $LOG
+#
+# END OF FILESYSTEM MOUNTS
+#
+echo "10" > /proc/sys/fs/lease-break-time
+
+# Loop through and process each mount the MOUNTS array
+for mount in $MOUNTS; do
+
+   # If the mount is a directory attemp to trim it
+   if [[ -d $mount ]]; then
+
+      # Attempt to trim the current directory and store results 
+      result=$(fstrim -v $mount)
+
+      # If trim succeeds, log results and continue processing
+      if [[ $result ]]; then
+         echo "Succeeded: $result from {$mount}\n" >> $LOG
+
+      # Else, the trim failed. Log results and continue
+      else
+         echo "({$mount} cannot be trimmed - skipping and moving on)\n" >> $LOG
+      fi
+
+   # Else if the mount is a file, log results and skip to the next mount
+   elif [[ -f $mount ]]; then
+      echo "({$mount} is a file - skipping and moving on)\n" >> $LOG
+
+   # Else if the mount is a symlink, log results and skip to the next mount
+   elif [[ -h $mount ]]; then
+      echo "({$mount} is a symbolic link - skipping and moving on)\n" >> $LOG
+
+   # Else, mount is neither a directory, a file, or symlink...
+      else
+      echo "({$mount} is neither a file, directory or symlink...interesting - skipping and moving on)\n" >>  $LOG
+
+   fi
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/04fs.log
+chmod 755 -R /data/tweakslog/04fs.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/04fs.log
+
+done
+
+# Finish logging by writing the footer
+echo $LOG_END >> $LOG

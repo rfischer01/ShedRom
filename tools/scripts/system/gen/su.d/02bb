@@ -1,0 +1,86 @@
+#!/system/bin/sh
+
+BB=/data/tweakslog/02BB.log
+
+file="/system/bin/busybox"
+file1="/su/bin/busybox"
+file2="/su/xbin/busybox"
+file3="/system/xbin/busybox"
+
+mount -o remount,rw /
+mount -o remount,rw /system
+
+# Create /data/tweakslog
+if [ -e $BB ]; then
+rm $BB;
+fi;
+mkdir /data/tweakslog
+chown 0:0 -R /data/tweakslog
+chmod 755 -R /data/tweakslog
+chcon u:object_r:system_data_file:s0 /data/tweakslog
+
+# Create /system/etc/cron.d
+mkdir /system/etc/cron.d
+chown 0:0 -R /system/etc/cron.d
+chmod 755 -R /system/etc/cron.d
+chcon u:object_r:system_file:s0 /system/etc/cron.d
+mkdir /system/etc/cron.d/bin
+chown 0:0 -R /system/etc/cron.d/bin
+chmod 755 -R /system/etc/cron.d/bin
+chcon u:object_r:system_file:s0 /system/etc/cron.d/bin
+
+echo "Starting to search for busybox" | tee -a $BB;
+
+if [ -f "$file" ];
+then
+echo "Busybox found in /system/bin." | tee -a $BB;
+echo "" | tee -a $BB;
+elif [ -f "$file1" ];
+then
+echo "Busybox found in /su/bin." | tee -a $BB;
+echo "" | tee -a $BB;
+cp -p /su/bin/busybox /system/etc/cron.d/bin
+chown 0:0 -R /system/etc/cron.d/bin
+chmod 755 -R /system/etc/cron.d/bin
+chcon u:object_r:system_file:s0 /system/etc/cron.d/bin
+cp -p /system/etc/cron.d/bin/busybox /system/bin
+chown 0:0 -R /system/bin/busybox
+chmod 755 -R /system/bin/busybox
+chcon u:object_r:system_file:s0 /system/bin/busybox
+elif [ -f "$file2" ];
+then
+echo "Busybox found in /su/xbin." | tee -a $BB;
+echo "" | tee -a $BB;
+cp -p /su/xbin/busybox /system/etc/cron.d/bin
+chown 0:0 -R /system/etc/cron.d/bin
+chmod 755 -R /system/etc/cron.d/bin
+chcon u:object_r:system_file:s0 /system/etc/cron.d/bin
+cp -p /system/etc/cron.d/bin/busybox /system/bin
+chown 0:0 -R /system/bin/busybox
+chmod 755 -R /system/bin/busybox
+chcon u:object_r:system_file:s0 /system/bin/busybox
+elif [ -f "$file3" ];
+then
+echo "Busybox found in /system/xbin." | tee -a $BB;
+echo "" | tee -a $BB;
+cp -p /system/xbin/busybox /system/etc/cron.d/bin
+chown 0:0 -R /system/etc/cron.d/bin
+chmod 755 -R /system/etc/cron.d/bin
+chcon u:object_r:system_file:s0 /system/etc/cron.d/bin
+cp -p /system/etc/cron.d/bin/busybox /system/bin
+chown 0:0 -R /system/bin/busybox
+chmod 755 -R /system/bin/busybox
+chcon u:object_r:system_file:s0 /system/bin/busybox
+else
+echo "Busybox not found. Please use another installer" | tee -a $BB;
+echo "" | tee -a $BB;
+fi;
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/02BB.log
+chmod 755 -R /data/tweakslog/02BB.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/02BB.log
+
+# Remount read-only
+mount -o remount,ro /
+mount -o remount,ro /system

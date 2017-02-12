@@ -1,0 +1,21 @@
+#!/system/bin/sh
+busybox mount -o remount,rw /
+SE=/data/tweakslog/03SE.log
+if [ -e $SE ]; then
+	rm $SE;
+fi;
+rm CON
+setenforce 0
+if grep 0 /sys/fs/selinux/enforce; then
+busybox echo "Kernel set in Permissive mode" | $BB tee -a $SE;
+else
+busybox echo "Kernel set in Enforcing mode" | $BB tee -a $SE;
+fi
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/03SE.log
+chmod 755 -R /data/tweakslog/03SE.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/03SE.log
+
+# Remount read-only
+busybox mount -o remount,ro /

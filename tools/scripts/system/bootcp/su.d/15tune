@@ -1,0 +1,48 @@
+#!/system/bin/sh
+
+$BB mount -o remount,rw /
+$BB mount -o remount,rw / /
+$BB mount -o remount,rw rootfs
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+#-- Setting CPU governor to Ondemand
+for i in cpu0 cpu1 cpu2 cpu3 cpu4 cpu5 cpu6 cpu7; do
+$BB echo "ondemand" > /sys/devices/system/cpu/$i/*/scaling_governor
+done
+#-- Set frequencies and voltages
+MIN_CPU_FREQ=$($busybox cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq);
+MAX_CPU_FREQ=$($busybox cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq);
+$BB echo "15" > /sys/devices/system/*/ondemand/down_differential
+$BB echo "0" > /sys/devices/system/*/ondemand/ignore_nice_load
+$BB echo "0" > /sys/devices/system/*/ondemand/io_is_busy
+$BB echo $MIN_CPU_FREQ > /sys/devices/system/*/ondemand/optimal_freq
+$BB echo "0" > /sys/devices/system/*/ondemand/powersave_bias
+$BB echo "1" > /sys/devices/system/*/ondemand/sampling_down_factor
+$BB echo "20000" > /sys/devices/system/*/ondemand/sampling_rate
+$BB echo "20000" > /sys/devices/system/*/ondemand/sampling_rate_min
+$BB echo "1100000" > /sys/devices/system/*/ondemand/sync_freq
+$BB echo "95" > /sys/devices/system/*/ondemand/up_threshold
+$BB echo "65" > /sys/devices/system/*/ondemand/up_threshold_any_cpu_load
+$BB echo "0" > /sys/devices/system/*/ondemand/up_threshold_multi_core
+$BB echo $MAX_CPU_FREQ > /sys/devices/system/*/ondemand/optimal_max_freq
+$BB echo "7" > /sys/devices/system/*/ondemand/middle_grid_step
+$BB echo "37" > /sys/devices/system/*/ondemand/middle_grid_load
+$BB echo "50" > /sys/devices/system/*/ondemand/micro_freq_up_threshold
+$BB echo "14" > /sys/devices/system/*/ondemand/high_grid_step
+$BB echo "46" > /sys/devices/system/*/ondemand/high_grid_load
+$BB echo "10" > /sys/devices/system/*/ondemand/down_differential_multi_core
+
+/system/xbin/tune
+
+BB=/system/bin/busybox
+TU=/data/tweakslog/15TU.log
+$BB echo "OnDemand Governor Created" | $BB tee -a $TU;
+$BB echo "" | $BB tee -a $TU;
+$BB echo "CPU Tuning started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $TU;
+$BB echo "CPU Tuning completed at  : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $TU;
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/15TU.log
+chmod 755 -R /data/tweakslog/15TU.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/15TU.log
