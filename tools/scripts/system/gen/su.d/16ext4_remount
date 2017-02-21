@@ -1,0 +1,46 @@
+#!/system/bin/sh
+#*******************************************************************************************************************************************
+#What the EXT4 remount do.. it checks the already mounted partitions.. 
+#Then it remounts them with different barrier and commit values.. and it uses noauto_da_alloc.
+#This option activates a sort of Ext3 emulation mode, which force sync on write close without sync.
+#It also comes with a speed penalty for SQLite writes, and is unneccessary when hardware barriers are enabled.
+#Barriers allow usage of delayed allocations without risk. Many broken applications don't use fsync() when noauto_da_alloc replacing existing files.
+#Using fsync more often to reduce the risk for ext4 this would reduce performance on ext3 filesystems mounted with the data=ordered flag.. 
+#Given that both file systems will be in use for some... 
+#ext4 in Linux kernels 2.6.30 and newer detect the occurrence of such cases and force the files to be allocated immediately and For a cost in performance, 
+#this provides semantics similar to ext3 ordered mode and increases the chance that either version of the file will survive the crash. 
+#This new behavior is enabled by default, but I disabled it with "noauto_da_alloc" mount option.
+#I also used delalloc or delayed allocation which works by deferring the mapping of newly-written file data blocks to disk blocks in the filesystem until writeback time...
+#It reduces filesystem fragmentation, because all (or a large number) of blocks for a single file can be allocated at the same time..
+#And reduces CPU cycles spent in block allocation, because the block allocator can allocate many or all of the blocks for the file at one time, 
+#instead of doing searching and locking for each block in the file as it is written without delayed allocation..
+#And it may avoid the need for disk updates for metadata creation for short-lived files, which in turn reduces fragmentation.
+#*******************************************************************************************************************************************
+#Made by SimplTeam.
+#Rmount ext4 with noatime, noauto_da_alloc and delalloc only for Data and cache.
+#Add.. (for full system remount)
+#mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /system /system;
+#Or Add.. (to remount system with noauto_da_alloc only)
+#mount -o remount,noauto_da_alloc /system /system
+#*******************************************************************************************************************************************
+LOG_FILE=/data/tweakslog/16ext4_remount.log
+if [ -e $LOG_FILE ]; then
+	rm $LOG_FILE;
+fi;
+chown 0:0 -R /data/tweakslog/16ext4_remount.log
+chmod 755 -R /data/tweakslog/16ext4_remount.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/16ext4_remount.log
+if ( mount | grep -w ext4 ) then
+	echo "EXT4 Partition Found!"
+	echo "Remounting..."
+	mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
+	mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
+	mount >> /data/tweakslog/16ext4_remount.log;
+else
+	echo "EXT4 Partition Not Found!"
+fi;
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/16ext4_remount.log
+chmod 755 -R /data/tweakslog/16ext4_remount.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/16ext4_remount.log

@@ -1,0 +1,68 @@
+#!/system/bin/sh
+
+BB=/system/bin/busybox
+
+# Mounting #
+$BB mount -o remount,rw /
+$BB mount -o remount,rw / /
+$BB mount -o remount,rw rootfs
+$BB mount -o remount,rw /system
+$BB mount -o remount,rw /system /system
+
+# KILL GOOGLE APPS #
+KGA=/data/tweakslog/10KGA.log
+if [ -e $KGA ]; then
+	rm $KGA;
+fi;
+chown 0:0 -R /data/tweakslog/10KGA.log
+chmod 755 -R /data/tweakslog/10KGA.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/10KGA.log
+$BB echo "Start of Killing Google Apps : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KGA;
+$BB killall -9 com.google.android.gms
+$BB echo "=====* Kill com.google.android.gms..." | $BB tee -a $KGA
+$BB killall -9 com.google.android.gms.persistent
+$BB echo "=====* Kill com.google.android.gms.persistent..." | $BB tee -a $KGA
+$BB killall -9 com.google.android.gsf
+$BB echo "=====* Kill com.google.android.gsf..." | $BB tee -a $KGA
+$BB killall -9 com.google.android.gsf.persistent
+$BB echo "=====* Kill com.google.android.gsf.persistent..." | $BB tee -a $KGA
+$BB killall -9 com.google.process.gapps
+$BB echo "=====* Kill com.google.process.gapps..." | $BB tee -a $KGA
+$BB echo "End of Killing Google Apps : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $KGA;
+
+# Launcher Keeper Priority #
+LKP=/data/tweakslog/10LKP.log
+if [ -e $LKP ]; then
+	rm $LKP;
+fi;
+list="com.android.launcher com.teslacoilsw.launcher";
+
+$BB echo "Launcher Keeper started on : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $LKP;
+while sleep 60; do
+ for L in $list; do
+   if [ `$BB pgrep $L | $BB head -n 1` ]; then
+   LC=`$BB pgrep $L`;
+   $BB echo -17 > /proc/$LC/oom_adj;
+   $BB chmod 100 /proc/$LC/oom_adj;
+   $BB renice -18 $LC;
+   $BB echo "Launcher $L = Highest Priority" | $BB tee -a $LKP;
+   fi;
+ done;
+ exit;
+done& 
+$BB echo "Launcher Keeper done at : $( date +"%m-%d-%Y %H:%M:%S" ) " | $BB tee -a $LKP;
+
+# Set Permissions
+chown 0:0 -R /data/tweakslog/10KGA.log
+chmod 755 -R /data/tweakslog/10KGA.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/10KGA.log
+chown 0:0 -R /data/tweakslog/10LKP.log
+chmod 755 -R /data/tweakslog/10LKP.log
+chcon u:object_r:system_data_file:s0 /data/tweakslog/10LKP.log
+
+# Remount read-only
+$BB mount -o remount,ro /
+$BB mount -o remount,ro / /
+$BB mount -o remount,ro rootfs
+$BB mount -o remount,ro /system
+$BB mount -o remount,ro /system /system
