@@ -3,11 +3,11 @@ ini_set("dp","7");
 ini_set("force_colorspace", "rgba");
 
 # Initializing Rom Information
-ini_set("rom_name",             "WilNeoLitic BPL2 ROM");
-ini_set("rom_version",          "1.6.4.0");
+ini_set("rom_name",             "Shedrock BQA2 ROM");
+ini_set("rom_version",          "1.6.5.0");
 ini_set("rom_author",           "wilmans2m");
 ini_set("rom_device",           "SM G903F");
-ini_set("rom_date",             "31.01.2017");
+ini_set("rom_date",             "22.02.2017");
 
 # Setup Theme
 fontresload("0", "ttf/Roboto-Regular.ttf", "12");
@@ -49,7 +49,7 @@ agreebox(
 # Main
 menubox(
 	#-- Title
-	"WilNeoLitic Rom Installer",
+	"Shedrock Rom Installer",
 	#-- Sub Title
 	"Please select menu below to start",
 	#-- Icon
@@ -120,11 +120,11 @@ endif;
 	      "@apps",
 	      "firm.prop",
 		  
-		  "Flash stock BPL2 Kernel ?", 	"",		2,  #-- Group 1 - key = "selected.1"
+		  "Flash stock BQA2 Kernel ?", 	"",		2,  #-- Group 1 - key = "selected.1"
 		  "Yes",					"",		1,	#-- selected.1 = 1
 		  "No",						"",		0,	#-- selected.1 = 2
 
-		  "Flash stock BPL2 Modem ?",	"",		2,	#-- Group 2 - key = "selected.2"
+		  "Flash stock BQA2 Modem ?",	"",		2,	#-- Group 2 - key = "selected.2"
 		  "Yes",					"",		0,	#-- selected.2 = 1
 		  "No",						"",		1	#-- selected.2 = 2
 	   );
@@ -156,7 +156,7 @@ endif;
 			then
 				checkbox(
 					"Boot Scripts",
-					"Choose Script to execute",
+					"Choose Script to execute at boot",
 					"@customize",
 					"bootscript.prop",
 					
@@ -170,38 +170,6 @@ endif;
 	   else
 			writetmpfile(
 				"bootscript.prop",
-				"item.1=0\n"
-			);
-	   endif;
-	   
-# CRON AUTO SCRIPT
-	selectbox(
-		"Automatic tasks",
-		"Select here to use some automatic tasks or not",
-		"@customize",
-		"crond.prop",
-				
-		"Install Auto-tasks feature ?", "", 2, #-- Group 1 - key = "selected.1"
-		"Yes",							"",	0, #-- selected.1 = 1
-		"No",							"", 0  #-- selected.1 = 2
-	);
-
-		if (prop("crond.prop","selected.1")=="1")
-			then
-				checkbox(
-					"Auto-tasks Scripts",
-					"Which one ?",
-					"@customize",
-					"cronscript.prop",
-					
-					"Choose the auto tasks", "", 2,
-					"Auto File Trimming",		 "Optimize Files 3x/week",  0, #1
-					"Auto File Cleaning",		 "Clean Files each day", 	0, #2
-					"Auto DB Optimize",			 "Optimize SQL DB 3x/week",	0  #3
-				);
-	   else
-			writetmpfile(
-				"cronscript.prop",
 				"item.1=0\n"
 			);
 	   endif;
@@ -226,12 +194,11 @@ endif;
 		"bootanim.prop",
 					
 		"Boot Animation available:",	"",	2, #-- Group 1 - key = "selected.1"
-		"AeNomolyll",						"",	1, #-- selected.1 = 1
-		"Marshmallow",						"",	0, #-- selected.1 = 2
-		"Piss Off Apple",					"",	0, #-- selected.1 = 3
-		"Note 7 black",						"",	0, #-- selected.1 = 4
-		"Note 7 White",						"",	0, #-- selected.1 = 5
-		"None",								"",	0  #-- selected.1 = 6
+		"Marshmallow",						"",	0, #-- selected.1 = 1
+		"Piss Off Apple",					"",	0, #-- selected.1 = 2
+		"Note 7 black",						"",	0, #-- selected.1 = 3
+		"Note 7 White",						"",	0, #-- selected.1 = 4
+		"None",								"",	0  #-- selected.1 = 5
 	);	
 	   
 # CSC
