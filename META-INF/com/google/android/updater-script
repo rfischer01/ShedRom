@@ -1,6 +1,6 @@
 #--INFORMATION
 ui_print("********************************************");
-ui_print("* Installing WilNeoLitic ROM");
+ui_print("* Installing Shedrock ROM");
 ui_print("********************************************");
 set_progress(0.05);
 
@@ -150,58 +150,6 @@ set_progress(0.28);
 			ui_print("-- You choose to not install CPU Optimizing script");
 		endif;
 
-#--CROND
-set_progress(0.35);	
-	if 
-		file_getprop("/tmp/aroma-data/crond.prop", "selected.1") == "1"
-	then
-		ui_print("-- Installing Cron.d");
-		delete_recursive("/data/cronlog");
-		package_extract_dir("tools/cron.d/log/", "/data/cronlog");
-		package_extract_dir("tools/cron.d/system/", "/system");
-		set_perm_recursive(0, 0, 0755, 0755, "/data/cronlog");
-	else
-		ui_print("-- You choose to not install Cron.d");
-	endif;
-	
-	if 
-		file_getprop("/tmp/aroma-data/cronscript.prop", "item.1.1") == "1"
-	then
-		ui_print("-- Installing Auto File Trimming script");
-		package_extract_dir("tools/cron.d/systemfs/system/xbin", "/system/xbin");
-		package_extract_dir("tools/scripts/system/bootfs/xbin/", "/system/xbin");
-		package_extract_dir("tools/cron.d/systemfs/tweaks/", "/sdcard/tmp");
-		set_metadata("/sdcard/tmp/tweaksfs.sh", "uid", 0, "gid", 2000, "mode", 0777, "capabilities", 0x0, "selabel", "u:object_r:tweaks_sh_file:s0");
-		run_program("/sdcard/tmp/tweaksfs.sh");
-	else
-		ui_print("-- You choose to not install Auto File Trimming script");
-	endif;
-
-	if 
-		file_getprop("/tmp/aroma-data/cronscript.prop", "item.1.2") == "1"
-	then
-		ui_print("-- Installing Auto File Cleaning script");
-		package_extract_dir("tools/cron.d/systemclean/system/xbin", "/system/xbin");
-		package_extract_dir("tools/cron.d/systemclean/tweaks/", "/sdcard/tmp");
-		set_metadata("/sdcard/tmp/tweaksclean.sh", "uid", 0, "gid", 2000, "mode", 0777, "capabilities", 0x0, "selabel", "u:object_r:tweaks_sh_file:s0");
-		run_program("/sdcard/tmp/tweaksclean.sh");
-	else
-		ui_print("-- You choose to not install Auto File Cleaning script");
-	endif;
-
-	if 
-		file_getprop("/tmp/aroma-data/cronscript.prop", "item.1.3") == "1"
-	then
-		ui_print("-- Installing Auto DB Optimize script");
-		package_extract_dir("tools/scripts/system/bootws/xbin/", "/system/xbin");
-		package_extract_dir("tools/cron.d/systemsql/system/xbin", "/system/xbin");
-		package_extract_dir("tools/cron.d/systemsql/tweaks/", "/sdcard/tmp");
-		set_metadata("/sdcard/tmp/tweaksql.sh", "uid", 0, "gid", 2000, "mode", 0777, "capabilities", 0x0, "selabel", "u:object_r:tweaks_sh_file:s0");
-		run_program("/sdcard/tmp/tweaksql.sh");
-	else
-		ui_print("-- You choose to not install Auto DB Optimize script");
-	endif;
-
 #--LAUNCHER
 set_progress(0.40);
 ui_print("-- Installing Launcher");
@@ -282,30 +230,25 @@ ui_print("-- Installing Boot Animation");
 	if
 		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "1"
 	then
-		package_extract_dir("tools/bootanim/AeNomolyll/", "/system");
+		package_extract_dir("tools/bootanim/AndroidM/", "/system");
 	endif;
 	if
 		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "2"
 	then
-		package_extract_dir("tools/bootanim/AndroidM/", "/system");
+		package_extract_dir("tools/bootanim/Apple/", "/system");
 	endif;
 	if
 		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "3"
 	then
-		package_extract_dir("tools/bootanim/Apple/", "/system");
+		package_extract_dir("tools/bootanim/N7B/", "/system");
 	endif;
 	if
 		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "4"
 	then
-		package_extract_dir("tools/bootanim/N7B/", "/system");
-	endif;
-	if
-		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "5"
-	then
 		package_extract_dir("tools/bootanim/N7W/", "/system");
 	endif;
 	if
-		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "6"
+		file_getprop("/tmp/aroma/bootanim.prop", "selected.1") == "5"
 	then
 		ui_print("-- Stock Boot Animation installed");
 	endif;
