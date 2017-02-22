@@ -1,0 +1,176 @@
+
+# ARISE Sound Systems™
+#
+# Deuteronomy™ 2.77 Modular Installer 20170215
+#
+# "SwanSong"
+#
+# /sdcard/arise_customize.prop
+#
+# www.arisesound.com
+
+
+
+# The ARISE™ modular installation zip works by using this file (when present in /sdcard as /sdcard/arise_customize.prop) to determine if any modules are to be installed by the value of "true" for each line below.
+
+# Any value other than "true" is the same as "false".
+
+
+
+# Add "true"to desired add-on(s). Example:
+
+
+
+install.xxxx=true
+
+
+
+# Deuteronomy™ must be installed at least once. Once Deuteronomy™ is installed, the value of "true" can be removed for future customization without installing the core Deuteronomy™ system again.
+
+
+install.deuteronomy=true
+
+
+#
+
+#
+
+# Select either ViPER4Arise™ version below to be installed or ignore to not install ViPER4Arise™ at all.
+
+
+install.v4a_2.5.0.5=true
+
+install.v4a_2.3.4.0=false
+
+
+#
+
+#
+
+
+install.v4a_profiles=false
+
+
+install.atmos=false
+
+
+install.ddplus=false
+
+
+install.am3d=true
+
+
+install.arkamys=false
+
+
+#
+
+#
+
+
+## ICEsound™ START ##
+
+
+install.ICEsound=false
+
+
+# Add "0", "1", "2", "3", "4", "5", or "6" for the desired ICEsound™ configuration below. "0" will delete /system/etc/icesoundconfig.def. Example:
+
+use.ICEco**ig=0
+
+use.ICEconfig=0
+
+
+# The following ICEsound™ presets are available below. <None> will remove an existing preset to use no ICEsound™ preset. Enter a value exactly as shown below. Example:
+
+use.ICEsound.pr**et=DEEPBASS
+
+DEEPBASS
+DEFAULT
+HOLYSHIT
+KRAZY
+MOVIE
+MUSIC2
+OUTDOORS
+PURE
+PURESHIT
+WIDECLARITY
+None
+
+
+use.ICEsound.preset=
+
+
+## ICEsound™ END ##
+
+
+#
+
+#
+
+
+install.sony=true
+
+
+install.v4a_xhifi=false
+
+
+install.esira=false
+
+
+install.ToolBox=false
+
+
+install.musicfx=false
+
+
+delete.deep_buffer=true
+
+
+set.selinux.permissive=false
+
+
+repair.sdcard.permissions=false
+
+
+#
+
+# The ARISE™ modular installation zip works by using this file (when present in /sdcard as /sdcard/arise_customize.prop) to determine if any modules are to be UNINSTALLED by the value of "true" for each line below.
+
+# Any value other than "true" is the same as "false".
+
+
+UNINSTALL.v4a=false
+
+
+UNINSALL.atmos=false
+
+
+UNINSTALL.ddplus=false
+
+
+UNINSTALL.arkamys=false
+
+
+UNINSTALL.ICEsound=false
+
+
+UNINSTALL.am3d=false
+
+
+UNINSTALL.sony=false
+
+
+UNINSTALL.esira=false
+
+
+UNINSTALL.ToolBox=false
+
+
+UNINSTALL.v4a_xhifi=false
+
+
+UNINSTALL.musicfx=false
+
+
+#
