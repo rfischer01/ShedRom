@@ -1,0 +1,37 @@
+#!/system/bin/sh
+setprop persist.service.lgospd.enable 0
+setprop persist.service.pcsync.enable 0
+setprop persist.sys.scrollingcache 3
+setprop ro.max.fling_velocity 12000
+setprop ro.min.fling_velocity 8000
+setprop windowsmgr.max_events_per_sec 90
+setprop touch.deviceType touchScreen
+setprop touch.orientationAware 1
+setprop ro.media.enc.jpeg.quality 100
+setprop ro.media.dec.jpeg.memcap 8000000
+setprop ro.media.enc.hpsetprop rof.vid.bps 8000000
+setprop ro.media.capture.maxres 8m
+setprop ro.media.panorama.defres 3264x1840
+setprop ro.media.panorama.frameres 1280x720
+setprop ro.camcorder.videoModes true
+setprop ro.media.enc.hprof.vid.fps 60
+setprop ro.media.dec.aud.wma.enabled 1
+setprop ro.media.dec.vid.wmv.enabled 1
+setprop ro.media.cam.preview.fps 0
+setprop ro.media.codec_priority_for_thumb so
+setprop ro.media.capture.flash led
+setprop ro.media.capture.flashMinV 3300000
+setprop ro.media.capture.torchIntensity 40
+setprop ro.media.capture.flashIntensity 70
+setprop ro.media.capture.fast.fps 4
+setprop ro.media.capture.slow.fps 120
+setprop ro.service.swiqi3.supported true
+setprop persist.service.swiqi3.enable 1
+setprop ro.service.xrfm.supported true
+setprop persist.service.xrfm.mode 2
+setprop sys.swiqi.service.boot 1
+setprop ro.service.swiqi.supported true
+setprop persist.service.swiqi.enable 1
+setprop ro.service.swiqi2.supported true
+setprop persist.service.swiqi2.enable 1
+setprop ro.service.xrfm.supported tru
