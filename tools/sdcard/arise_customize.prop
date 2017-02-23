@@ -1,7 +1,5 @@
 
-# ARISE Sound Systems™
-#
-# Deuteronomy™ 2.77 Modular Installer 20170215
+# ARISE Sound Systems™ 20170219
 #
 # "SwanSong"
 #
@@ -10,14 +8,13 @@
 # www.arisesound.com
 
 
-
-# The ARISE™ modular installation zip works by using this file (when present in /sdcard as /sdcard/arise_customize.prop) to determine if any modules are to be installed by the value of "true" for each line below.
-
-# Any value other than "true" is the same as "false".
+# The ARISE™ modular installation zip works by using this file (when present in /sdcard as /sdcard/arise_customize.prop) to determine if any modules are to be installed by a value of "true" for each line below.
 
 
+# Any value other than "true" is the same as a value of "false".
 
-# Add "true"to desired add-on(s). Example:
+
+# Add a value of "true" to desired add-on(s). Example:
 
 
 
@@ -25,65 +22,94 @@ install.xxxx=true
 
 
 
-# Deuteronomy™ must be installed at least once. Once Deuteronomy™ is installed, the value of "true" can be removed for future customization without installing the core Deuteronomy™ system again.
+# The core module must be installed at least once. Once the core module is installed, the value of "true" should be removed for future customization installing, uninstalling, or executing scripts and modules.
 
 
-install.deuteronomy=true
+# If a rom update or system wipe is performed resulting in the need to reinstall the sound system, edit /sdcard/arise_customize.prop to include a value of "true" for the core module to complete your sound system installation, followed by removing the value of "true" from the core module once booted.
 
 
-#
 
-#
+install.core=true
+
+
 
 # Select either ViPER4Arise™ version below to be installed or ignore to not install ViPER4Arise™ at all.
 
 
+
 install.v4a_2.5.0.5=true
 
-install.v4a_2.3.4.0=false
+install.v4a_2.3.4.0=
 
 
-#
 
-#
-
-
-install.v4a_profiles=false
+# Add a value of "true" to any modules below to install.
 
 
-install.atmos=false
+
+install.v4a_profiles=
 
 
-install.ddplus=false
+install.atmos=
 
 
-install.am3d=true
+install.ddplus=
 
 
-install.arkamys=false
+install.am3d=
 
 
-#
+install.arkamys=true
 
-#
+
+install.sony=true
+
+
+install.v4a_xhifi=
+
+
+install.esira=
+
+
+install.ToolBox=
+
+
+install.musicfx=
+
+
+delete.deep_buffer=true
+
+
+set.selinux.permissive=
+
+
+repair.sdcard.permissions=
+
 
 
 ## ICEsound™ START ##
 
 
-install.ICEsound=false
+# Add a value of "true" to install the ICEsound™ module.
 
 
-# Add "0", "1", "2", "3", "4", "5", or "6" for the desired ICEsound™ configuration below. "0" will delete /system/etc/icesoundconfig.def. Example:
+install.ICEsound=
+
+
+# Add a value of "0", "1", "2", "3", "4", "5", or "6" for the desired ICEsound™ configuration below. A value of "0" will delete /system/etc/icesoundconfig.def. Example:
+
 
 use.ICEco**ig=0
 
-use.ICEconfig=0
+
+use.ICEconfig=
 
 
-# The following ICEsound™ presets are available below. <None> will remove an existing preset to use no ICEsound™ preset. Enter a value exactly as shown below. Example:
+# The following ICEsound™ presets are available below. A value of "None" will remove an existing preset to use no ICEsound™ preset. Enter a value of the preset name exactly as shown below. Example:
+
 
 use.ICEsound.pr**et=DEEPBASS
+
 
 DEEPBASS
 DEFAULT
@@ -104,73 +130,42 @@ use.ICEsound.preset=
 ## ICEsound™ END ##
 
 
-#
-
-#
-
-
-install.sony=true
-
-
-install.v4a_xhifi=false
-
-
-install.esira=false
-
-
-install.ToolBox=false
-
-
-install.musicfx=false
-
-
-delete.deep_buffer=true
-
-
-set.selinux.permissive=false
-
-
-repair.sdcard.permissions=false
-
-
-#
-
 # The ARISE™ modular installation zip works by using this file (when present in /sdcard as /sdcard/arise_customize.prop) to determine if any modules are to be UNINSTALLED by the value of "true" for each line below.
 
-# Any value other than "true" is the same as "false".
+# Any value other than "true" is the same as a value of "false".
 
 
-UNINSTALL.v4a=false
+UNINSTALL.v4a=
 
 
-UNINSALL.atmos=false
+UNINSALL.atmos=
 
 
-UNINSTALL.ddplus=false
+UNINSTALL.ddplus=
 
 
-UNINSTALL.arkamys=false
+UNINSTALL.arkamys=
 
 
-UNINSTALL.ICEsound=false
+UNINSTALL.ICEsound=
 
 
-UNINSTALL.am3d=false
+UNINSTALL.am3d=
 
 
-UNINSTALL.sony=false
+UNINSTALL.sony=
 
 
-UNINSTALL.esira=false
+UNINSTALL.esira=
 
 
-UNINSTALL.ToolBox=false
+UNINSTALL.ToolBox=
 
 
-UNINSTALL.v4a_xhifi=false
+UNINSTALL.v4a_xhifi=
 
 
-UNINSTALL.musicfx=false
+UNINSTALL.musicfx=
 
 
-#
+# END
