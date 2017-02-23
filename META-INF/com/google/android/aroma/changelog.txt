@@ -1,0 +1,13 @@
+<b><#selectbg_g>Shedrock ROM BQA2 1.6.5.0</#></b>
+
+<*>Updated Firm base to BQA2</*>
+<*>Updated Stock kernel & modem to BQA2</*>
+<*>Reduced size by pre-deleting more bloatware</*>
+<*>Updated Sony Bravia & X-Reality Engine 4</*>
+<*>Deleted Cron options</*>
+<*>Reworked build properties (many does not have effect)</*>
+<*>Updated Viper ARISE Deuteronomy to Swansong</*>
+<*>Updated Magisk to 11.1</*>
+<*>Updated Nova Launcher to 5.02 beta 3</*>
+<*>Updated Tesla Unread</*>
+<*>Deleted some bootanim</*>
