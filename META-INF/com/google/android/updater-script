@@ -954,6 +954,7 @@ ui_print("-- Customize System");
 		run_program("/sbin/busybox", "unzip", "/sdcard/tmp/ViPER4Android.zip", "-n", "-d", "/data/media/legacy/");
 		set_metadata("/sdcard/tmp/viper.sh", "uid", 0, "gid", 2000, "mode", 0777, "capabilities", 0x0, "selabel", "u:object_r:viper_sh_file:s0");
 		run_program("/sdcard/tmp/viper.sh");
+		delete("/sdcard/arise_customize.prop")
 	endif;
 
 #--XPOSED
