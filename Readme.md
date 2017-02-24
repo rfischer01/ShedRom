@@ -11,6 +11,8 @@ SHEDROCK ROM using BPL2 based firmware (Marshmallow 6.01)
 
 Changelog:
 
+Current: 1.6.4.3
+
 <*>New base BPL2 firmware</*>
 <*>Updated stock kernel / modem with BQA2</*>
 <*>Partially debloated (some choices remain in AROMA)</*>
